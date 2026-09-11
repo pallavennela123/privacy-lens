@@ -6,55 +6,600 @@
 <title>Privacy Lens</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
-body{background:#000;color:#fff}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#050505;
+    color:white;
+}
+
 header{
-  padding:22px 8%;border-bottom:1px solid #292929;
-  display:flex;justify-content:space-between;align-items:center
+    padding:20px;
+    border-bottom:1px solid #333;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
-.logo{font-size:28px;font-weight:bold}
-.logo span{color:#55d98b}
-select,input,textarea,button{
-  padding:12px;border-radius:8px;border:1px solid #444;
-  background:#111;color:#fff
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
 }
-select{padding:9px 14px}
-.container{width:92%;max-width:1000px;margin:35px auto}
-.hero{text-align:center;margin-bottom:30px}
-.hero h1{font-size:40px;margin-bottom:10px}
-.hero h1 span{color:#55d98b}
-.hero p{color:#aaa;line-height:1.6}
+
+.logo span{
+    color:#55d98b;
+}
+
+.language{
+    background:#171717;
+    color:white;
+    border:1px solid #444;
+    padding:9px 14px;
+    border-radius:8px;
+}
+
+.container{
+    width:92%;
+    max-width:1000px;
+    margin:35px auto;
+}
+
+.hero{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.hero h1{
+    font-size:40px;
+    margin-bottom:12px;
+}
+
+.hero h1 span{
+    color:#55d98b;
+}
+
+.hero p{
+    color:#aaa;
+    line-height:1.6;
+}
 
 .card{
-  background:#101010;border:1px solid #292929;
-  border-radius:15px;padding:23px;margin-bottom:22px
+    background:#101010;
+    border:1px solid #292929;
+    border-radius:15px;
+    padding:22px;
+    margin-bottom:22px;
 }
-.card h2{margin-bottom:18px}
 
-.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-.tab{cursor:pointer}
-.tab.active{background:#55d98b;color:#000}
+.card h2{
+    margin-bottom:18px;
+}
 
-textarea,input[type="url"]{width:100%}
-textarea{height:170px;resize:vertical}
+.tabs{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+}
+
+.tab{
+    background:#191919;
+    color:white;
+    border:1px solid #444;
+    padding:11px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.tab.active{
+    background:#55d98b;
+    color:#000;
+}
+
+textarea,
+input{
+    width:100%;
+    background:#080808;
+    color:white;
+    border:1px solid #444;
+    padding:14px;
+    border-radius:9px;
+}
+
+textarea{
+    height:170px;
+    resize:vertical;
+}
 
 .upload{
-  border:2px dashed #444;padding:30px;text-align:center;
-  border-radius:12px;color:#aaa
+    border:2px dashed #444;
+    padding:30px;
+    text-align:center;
+    border-radius:12px;
+    color:#aaa;
 }
 
-input[type="file"]{margin-top:15px;border:0}
+input[type="file"]{
+    border:0;
+    margin-top:15px;
+}
 
 .analyze{
-  width:100%;margin-top:18px;background:#55d98b;
-  color:#000;font-weight:bold;cursor:pointer;font-size:16px
+    width:100%;
+    margin-top:18px;
+    padding:15px;
+    border:0;
+    border-radius:10px;
+    background:#55d98b;
+    color:#000;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.hidden{display:none}
+.hidden{
+    display:none;
+}
+
+#results{
+    display:none;
+}
 
 .scoreBox{
-  text-align:center;background:#080808;
-  padding:25px;border-radius:12px
+    text-align:center;
+    background:#080808;
+    padding:25px;
+    border-radius:12px;
 }
-.score{font-size:52px;font-weight:bold;color:#ff4545}
-.risk{color:#ff
+
+.score{
+    font-size:52px;
+    font-weight:bold;
+    color:#ff4040;
+}
+
+.risk{
+    display:inline-block;
+    margin-top:10px;
+    padding:8px 15px;
+    border-radius:20px;
+    background:#351010;
+    color:#ff4040;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:13px 8px;
+    text-align:left;
+    border-bottom:1px solid #292929;
+}
+
+.badge{
+    padding:6px 10px;
+    border-radius:15px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.high{
+    background:#351010;
+    color:#ff4040;
+}
+
+.medium{
+    background:#352b08;
+    color:#ffad00;
+}
+
+.low{
+    background:#123317;
+    color:#65dc57;
+}
+
+.nutrition{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.nutrition div{
+    background:#181818;
+    padding:17px 8px;
+    text-align:center;
+    border-radius:10px;
+}
+
+.explanation{
+    background:#101b14;
+    border-left:4px solid #55d98b;
+    padding:18px;
+    line-height:1.7;
+    border-radius:8px;
+}
+
+.warning{
+    background:#211b0a;
+    border-left:4px solid #ffad00;
+    padding:18px;
+    line-height:1.7;
+    border-radius:8px;
+    margin-top:15px;
+}
+
+.footer{
+    text-align:center;
+    color:#777;
+    padding:30px;
+}
+
+@media(max-width:650px){
+    .hero h1{
+        font-size:30px;
+    }
+
+    .nutrition{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+🔐 Privacy <span>Lens</span>
+</div>
+
+<select class="language" onchange="changeLanguage(this.value)">
+<option value="en">English</option>
+<option value="te">తెలుగు</option>
+</select>
+
+</header>
+
+
+<div class="container">
+
+<div class="hero">
+
+<h1>
+Privacy <span>Policy Analyzer</span>
+</h1>
+
+<p id="heroText">
+Understand what apps and websites do with your personal data.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h2>📄 Privacy Policy</h2>
+
+<div class="tabs">
+
+<button class="tab active"
+onclick="showTab('text',this)">
+📝 Paste Text
+</button>
+
+<button class="tab"
+onclick="showTab('pdf',this)">
+📄 Upload PDF
+</button>
+
+<button class="tab"
+onclick="showTab('url',this)">
+🔗 Website URL
+</button>
+
+</div>
+
+
+<div id="text">
+
+<textarea
+id="policyText"
+placeholder="Paste the privacy policy here...">
+</textarea>
+
+</div>
+
+
+<div id="pdf" class="hidden">
+
+<div class="upload">
+
+<h3>📄 Upload Privacy Policy PDF</h3>
+
+<p>Select a PDF from your device.</p>
+
+<input
+type="file"
+id="pdfFile"
+accept=".pdf">
+
+</div>
+
+</div>
+
+
+<div id="url" class="hidden">
+
+<input
+type="url"
+id="websiteURL"
+placeholder="https://example.com/privacy">
+
+</div>
+
+
+<button
+class="analyze"
+onclick="analyzePolicy()">
+
+🔍 Analyze Privacy Policy
+
+</button>
+
+</div>
+
+
+<div id="results">
+
+
+<div class="card">
+
+<h2>📊 Privacy Risk Score</h2>
+
+<div class="scoreBox">
+
+<div class="score">
+72/100
+</div>
+
+<div class="risk">
+🔴 HIGH RISK
+</div>
+
+<p style="margin-top:12px;color:#aaa;">
+Higher score means higher privacy concern.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>🤖 Privacy Analysis</h2>
+
+<table>
+
+<tr>
+<th>Category</th>
+<th>Result</th>
+</tr>
+
+<tr>
+<td>Personal Data</td>
+<td><span class="badge high">🔴 High</span></td>
+</tr>
+
+<tr>
+<td>Location</td>
+<td><span class="badge medium">🟠 Medium</span></td>
+</tr>
+
+<tr>
+<td>Contacts</td>
+<td><span class="badge low">🟢 Low</span></td>
+</tr>
+
+<tr>
+<td>Camera</td>
+<td><span class="badge low">🟢 Low</span></td>
+</tr>
+
+<tr>
+<td>Microphone</td>
+<td><span class="badge medium">🟠 Medium</span></td>
+</tr>
+
+<tr>
+<td>Device Information</td>
+<td><span class="badge high">🔴 High</span></td>
+</tr>
+
+<tr>
+<td>Browsing History</td>
+<td><span class="badge medium">🟠 Medium</span></td>
+</tr>
+
+<tr>
+<td>Cookies</td>
+<td><span class="badge medium">🟠 Medium</span></td>
+</tr>
+
+<tr>
+<td>Advertising</td>
+<td><span class="badge high">🔴 High</span></td>
+</tr>
+
+<tr>
+<td>Third-party Sharing</td>
+<td><span class="badge high">🔴 High</span></td>
+</tr>
+
+<tr>
+<td>Data Retention</td>
+<td><span class="badge medium">🟠 Medium</span></td>
+</tr>
+
+<tr>
+<td>Data Deletion</td>
+<td><span class="badge low">🟢 Low</span></td>
+</tr>
+
+<tr>
+<td>Security</td>
+<td><span class="badge low">🟢 Good</span></td>
+</tr>
+
+</table>
+
+</div>
+
+
+<div class="card">
+
+<h2>🏷️ Privacy Nutrition Label</h2>
+
+<div class="nutrition">
+
+<div>
+👤<br><br>
+Personal Data<br>
+<span class="badge high">High</span>
+</div>
+
+<div>
+📍<br><br>
+Location<br>
+<span class="badge medium">Medium</span>
+</div>
+
+<div>
+📢<br><br>
+Advertising<br>
+<span class="badge high">High</span>
+</div>
+
+<div>
+🔗<br><br>
+Third Parties<br>
+<span class="badge high">High</span>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>💡 Simple Explanation</h2>
+
+<div class="explanation">
+
+<b>What does this mean?</b>
+
+<p>
+This policy may collect several types of personal
+information. Some information may be used for
+advertising or shared with third parties.
+</p>
+
+</div>
+
+
+<div class="warning">
+
+⚠️ <b>Privacy Tip</b>
+
+<p>
+Check whether the permissions and data collection
+are really necessary before using the service.
+</p>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<div class="footer">
+🔐 Privacy Lens — Privacy made simple
+</div>
+
+
+<script>
+
+function showTab(tabName,button){
+
+document.getElementById("text")
+.classList.add("hidden");
+
+document.getElementById("pdf")
+.classList.add("hidden");
+
+document.getElementById("url")
+.classList.add("hidden");
+
+document.getElementById(tabName)
+.classList.remove("hidden");
+
+document.querySelectorAll(".tab")
+.forEach(btn =>
+btn.classList.remove("active")
+);
+
+button.classList.add("active");
+
+}
+
+
+function analyzePolicy(){
+
+document.getElementById("results")
+.style.display="block";
+
+document.getElementById("results")
+.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+
+function changeLanguage(language){
+
+const text =
+document.getElementById("heroText");
+
+if(language==="te"){
+
+text.innerText =
+"Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
+
+}else{
+
+text.innerText =
+"Understand what apps and websites do with your personal data.";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
