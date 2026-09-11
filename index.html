@@ -569,14 +569,52 @@ button.classList.add("active");
 
 function analyzePolicy(){
 
-document.getElementById("results")
-.style.display="block";
+    const text =
+        document.getElementById("policyText")
+        .value
+        .toLowerCase();
 
-document.getElementById("results")
-.scrollIntoView({
-behavior:"smooth"
-});
+    let score = 20;
 
+    if(text.includes("location")) score += 10;
+    if(text.includes("phone")) score += 10;
+    if(text.includes("email")) score += 10;
+    if(text.includes("contacts")) score += 10;
+    if(text.includes("browsing")) score += 10;
+    if(text.includes("advertising")) score += 10;
+    if(text.includes("third-party")) score += 10;
+    if(text.includes("device information")) score += 10;
+
+    if(score > 100){
+        score = 100;
+    }
+
+    document.querySelector(".score").innerText =
+        score + "/100";
+
+    const risk =
+        document.querySelector(".risk");
+
+    if(score >= 70){
+        risk.innerText = "🔴 HIGH RISK";
+        risk.style.color = "#ff4040";
+    }
+    else if(score >= 40){
+        risk.innerText = "🟠 MEDIUM RISK";
+        risk.style.color = "#ffad00";
+    }
+    else{
+        risk.innerText = "🟢 LOW RISK";
+        risk.style.color = "#65dc57";
+    }
+
+    document.getElementById("results")
+        .style.display = "block";
+
+    document.getElementById("results")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
 }
 
 
