@@ -253,7 +253,9 @@ th,td{
 <div class="container">
 
   <div class="hero">
-    <h1>Privacy <span>Policy Analyzer</span></h1>
+<h1>
+<span id="privacyPolicyTitle">Privacy Policy Analyzer</span>
+</h1>
     <p id="heroText">
       Understand what apps and websites do with your personal data.
     </p>
@@ -553,30 +555,35 @@ function analyzePolicy(){
 
 }
 
-
 function changeLanguage(language){
 
   const text = document.getElementById("heroText");
-
   const pasteTab = document.getElementById("pasteTab");
   const pdfTab = document.getElementById("pdfTab");
   const urlTab = document.getElementById("urlTab");
   const analyzeBtnText = document.getElementById("analyzeBtnText");
+  const privacyPolicyTitle = document.getElementById("privacyPolicyTitle");
 
   if(language === "te"){
 
     text.innerText =
-    "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
+    "యాప్స్ మరియు వెబ్‌సైట్లు మీ పర్సనల్ డేటాతో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
 
-    pasteTab.innerText = "📝 Text ని Paste చేయండి";
-    pdfTab.innerText = "📄 PDF Upload చేయండి";
-    urlTab.innerText = "🔗 Website URL";
-    analyzeBtnText.innerText = "🔍 Privacy Policy ని Analyze చేయండి";
+    if(privacyPolicyTitle)
+      privacyPolicyTitle.innerText = "ప్రైవసీ పాలసీ అనలైజర్";
+
+    pasteTab.innerText = "📝 టెక్స్ట్ పేస్ట్ చేయండి";
+    pdfTab.innerText = "📄 PDF అప్‌లోడ్ చేయండి";
+    urlTab.innerText = "🔗 వెబ్‌సైట్ URL";
+    analyzeBtnText.innerText = "🔍 ప్రైవసీ పాలసీని అనలైజ్ చేయండి";
 
   }else{
 
     text.innerText =
     "Understand what apps and websites do with your personal data.";
+
+    if(privacyPolicyTitle)
+      privacyPolicyTitle.innerText = "Privacy Policy Analyzer";
 
     pasteTab.innerText = "📝 Paste Text";
     pdfTab.innerText = "📄 Upload PDF";
