@@ -270,17 +270,17 @@ th,td{
 
       <button class="tab active"
         onclick="showTab('text',this)">
-        📝 Paste Text
+      <span id="pasteTab">📝 Paste Text</span>
       </button>
 
       <button class="tab"
         onclick="showTab('pdf',this)">
-        📄 Upload PDF
+       <span id="pdfTab">📄 Upload PDF</span>
       </button>
 
       <button class="tab"
         onclick="showTab('url',this)">
-        🔗 Website URL
+        <span id="urlTab">🔗 Website URL</span>
       </button>
 
     </div>
@@ -321,7 +321,7 @@ th,td{
 
 
     <button class="analyze" onclick="analyzePolicy()">
-      🔍 Analyze Privacy Policy
+      <span id="analyzeBtnText">🔍 Analyze Privacy Policy</span>
     </button>
 
   </div>
@@ -556,49 +556,36 @@ function analyzePolicy(){
 
 function changeLanguage(language){
 
-    const heroText = document.getElementById("heroText");
+  const text = document.getElementById("heroText");
 
-    if(language === "te"){
+  const pasteTab = document.getElementById("pasteTab");
+  const pdfTab = document.getElementById("pdfTab");
+  const urlTab = document.getElementById("urlTab");
+  const analyzeBtnText = document.getElementById("analyzeBtnText");
 
-        heroText.innerText =
-        "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
+  if(language === "te"){
 
-        document.querySelector(".hero h1").innerHTML =
-        "Privacy <span>Policy Analyzer</span>";
+    text.innerText =
+    "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
 
-        document.querySelector(".card h2").innerText =
-        "📄 Privacy Policy";
+    pasteTab.innerText = "📝 Text ని Paste చేయండి";
+    pdfTab.innerText = "📄 PDF Upload చేయండి";
+    urlTab.innerText = "🔗 Website URL";
+    analyzeBtnText.innerText = "🔍 Privacy Policy ని Analyze చేయండి";
 
-    }
+  }else{
 
-    else if(language === "hi"){
+    text.innerText =
+    "Understand what apps and websites do with your personal data.";
 
-        heroText.innerText =
-        "समझें कि apps और websites आपके personal data के साथ क्या करते हैं।";
+    pasteTab.innerText = "📝 Paste Text";
+    pdfTab.innerText = "📄 Upload PDF";
+    urlTab.innerText = "🔗 Website URL";
+    analyzeBtnText.innerText = "🔍 Analyze Privacy Policy";
 
-        document.querySelector(".hero h1").innerHTML =
-        "Privacy <span>Policy Analyzer</span>";
-
-        document.querySelector(".card h2").innerText =
-        "📄 Privacy Policy";
-
-    }
-
-    else{
-
-        heroText.innerText =
-        "Understand what apps and websites do with your personal data.";
-
-        document.querySelector(".hero h1").innerHTML =
-        "Privacy <span>Policy Analyzer</span>";
-
-        document.querySelector(".card h2").innerText =
-        "📄 Privacy Policy";
-
-    }
+  }
 
 }
-
 </script>
 
 </body>
