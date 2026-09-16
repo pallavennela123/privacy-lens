@@ -241,10 +241,13 @@ th,td{
 <header>
   <div class="logo">🔐 Privacy <span>Lens</span></div>
 
-  <select onchange="changeLanguage(this.value)">
-    <option value="en">English</option>
-    <option value="te">తెలుగు</option>
-  </select>
+<select class="language" onchange="changeLanguage(this.value)">
+<option value="en">English</option>
+<option value="te">తెలుగు</option>
+<option value="hi">हिन्दी</option>
+</select>
+
+
 </header>
 
 <div class="container">
@@ -553,20 +556,46 @@ function analyzePolicy(){
 
 function changeLanguage(language){
 
-  const text =
-    document.getElementById("heroText");
+    const heroText = document.getElementById("heroText");
 
-  if(language === "te"){
+    if(language === "te"){
 
-    text.innerText =
-      "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
+        heroText.innerText =
+        "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
 
-  }else{
+        document.querySelector(".hero h1").innerHTML =
+        "Privacy <span>Policy Analyzer</span>";
 
-    text.innerText =
-      "Understand what apps and websites do with your personal data.";
+        document.querySelector(".card h2").innerText =
+        "📄 Privacy Policy";
 
-  }
+    }
+
+    else if(language === "hi"){
+
+        heroText.innerText =
+        "समझें कि apps और websites आपके personal data के साथ क्या करते हैं।";
+
+        document.querySelector(".hero h1").innerHTML =
+        "Privacy <span>Policy Analyzer</span>";
+
+        document.querySelector(".card h2").innerText =
+        "📄 Privacy Policy";
+
+    }
+
+    else{
+
+        heroText.innerText =
+        "Understand what apps and websites do with your personal data.";
+
+        document.querySelector(".hero h1").innerHTML =
+        "Privacy <span>Policy Analyzer</span>";
+
+        document.querySelector(".card h2").innerText =
+        "📄 Privacy Policy";
+
+    }
 
 }
 
