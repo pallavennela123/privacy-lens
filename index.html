@@ -553,45 +553,93 @@ function analyzePolicy(){
   });
 
 }
-
 function changeLanguage(language){
 
-  const text = document.getElementById("heroText");
-  const pasteTab = document.getElementById("pasteTab");
-  const pdfTab = document.getElementById("pdfTab");
-  const urlTab = document.getElementById("urlTab");
-  const analyzeBtnText = document.getElementById("analyzeBtnText");
-  const privacyPolicyTitle = document.getElementById("privacyPolicyTitle");
-const privacyPolicyHeading = document.getElementById("privacyPolicyHeading");
-  if(language === "te"){
+  const translations = {
 
-    text.innerText =
-    "యాప్స్ మరియు వెబ్‌సైట్లు మీ పర్సనల్ డేటాతో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
-if(privacyPolicyHeading)
-  privacyPolicyHeading.innerText = "ప్రైవసీ పాలసీ";
-    if(privacyPolicyTitle)
-      privacyPolicyTitle.innerText = "ప్రైవసీ పాలసీ అనలైజర్";
+    en:{
+      title:"Privacy Policy Analyzer",
+      hero:"Understand what apps and websites do with your personal data.",
+      heading:"Privacy Policy",
+      paste:"📝 Paste Text",
+      pdf:"📄 Upload PDF",
+      url:"🔗 Website URL",
+      analyze:"🔍 Analyze Privacy Policy",
+      pdfTitle:"📄 Upload Privacy Policy PDF",
+      pdfText:"Select a PDF from your device.",
+      scoreTitle:"📊 Privacy Risk Score",
+      scoreText:"Higher score means higher privacy concern.",
+      high:"🔴 HIGH RISK",
+      ai:"🤖 AI Analysis",
+      category:"Category",
+      result:"Result",
+      nutrition:"🏷️ Privacy Nutrition Label",
+      explanation:"💡 Simple Explanation",
+      meaning:"What does this mean?",
+      warning:"⚠️ Privacy Tip",
+      footer:"🔐 Privacy Lens — Privacy made simple",
+      placeholder:"Paste the privacy policy here...",
+      urlPlaceholder:"https://example.com/privacy"
+    },
 
-    pasteTab.innerText = "📝 టెక్స్ట్ పేస్ట్ చేయండి";
-pdfTab.innerText = "📄 పీడీఎఫ్ అప్‌లోడ్ చేయండి";
-urlTab.innerText = "🔗 వెబ్‌సైట్ యూఆర్ఎల్";
-        analyzeBtnText.innerText = "🔍 ప్రైవసీ పాలసీని అనలైజ్ చేయండి";
+    te:{
+      title:"ప్రైవసీ పాలసీ అనలైజర్",
+      hero:"యాప్స్ మరియు వెబ్‌సైట్లు మీ పర్సనల్ డేటాతో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.",
+      heading:"ప్రైవసీ పాలసీ",
+      paste:"📝 టెక్స్ట్ పేస్ట్ చేయండి",
+      pdf:"📄 పీడీఎఫ్ అప్‌లోడ్ చేయండి",
+      url:"🔗 వెబ్‌సైట్ యూఆర్ఎల్",
+      analyze:"🔍 ప్రైవసీ పాలసీని అనలైజ్ చేయండి",
+      pdfTitle:"📄 ప్రైవసీ పాలసీ పీడీఎఫ్ అప్‌లోడ్ చేయండి",
+      pdfText:"మీ డివైస్ నుండి పీడీఎఫ్ ఎంచుకోండి.",
+      scoreTitle:"📊 ప్రైవసీ రిస్క్ స్కోర్",
+      scoreText:"స్కోర్ ఎక్కువగా ఉంటే ప్రైవసీ సమస్య ఎక్కువగా ఉండవచ్చు.",
+      high:"🔴 హై రిస్క్",
+      ai:"🤖 ఏఐ అనాలిసిస్",
+      category:"కేటగిరీ",
+      result:"రిజల్ట్",
+      nutrition:"🏷️ ప్రైవసీ న్యూట్రిషన్ లేబుల్",
+      explanation:"💡 సింపుల్ ఎక్స్‌ప్లనేషన్",
+      meaning:"దీని అర్థం ఏమిటి?",
+      warning:"⚠️ ప్రైవసీ టిప్",
+      footer:"🔐 ప్రైవసీ లెన్స్ — ప్రైవసీని సింపుల్‌గా తెలుసుకోండి",
+      placeholder:"మీ ప్రైవసీ పాలసీని ఇక్కడ పేస్ట్ చేయండి...",
+      urlPlaceholder:"https://example.com/privacy"
+    }
 
-  }else{
+  };
 
-    text.innerText =
-    "Understand what apps and websites do with your personal data.";
+  const t = translations[language] || translations.en;
 
-    if(privacyPolicyTitle)
-      privacyPolicyTitle.innerText = "Privacy Policy Analyzer";
+  document.getElementById("privacyPolicyTitle").innerText = t.title;
+  document.getElementById("heroText").innerText = t.hero;
+  document.getElementById("privacyPolicyHeading").innerText = t.heading;
 
-    pasteTab.innerText = "📝 Paste Text";
-    pdfTab.innerText = "📄 Upload PDF";
-    urlTab.innerText = "🔗 Website URL";
-    analyzeBtnText.innerText = "🔍 Analyze Privacy Policy";
+  document.getElementById("pasteTab").innerText = t.paste;
+  document.getElementById("pdfTab").innerText = t.pdf;
+  document.getElementById("urlTab").innerText = t.url;
+  document.getElementById("analyzeBtnText").innerText = t.analyze;
 
-  }
+  document.getElementById("pdfTitle").innerText = t.pdfTitle;
+  document.getElementById("pdfText").innerText = t.pdfText;
 
+  document.getElementById("scoreTitle").innerText = t.scoreTitle;
+  document.getElementById("scoreText").innerText = t.scoreText;
+  document.getElementById("riskText").innerText = t.high;
+
+  document.getElementById("aiTitle").innerText = t.ai;
+  document.getElementById("categoryText").innerText = t.category;
+  document.getElementById("resultText").innerText = t.result;
+
+  document.getElementById("nutritionTitle").innerText = t.nutrition;
+  document.getElementById("explanationTitle").innerText = t.explanation;
+  document.getElementById("meaningText").innerText = t.meaning;
+  document.getElementById("warningText").innerText = t.warning;
+
+  document.getElementById("footerText").innerText = t.footer;
+
+  document.getElementById("policyText").placeholder = t.placeholder;
+  document.getElementById("websiteURL").placeholder = t.urlPlaceholder;
 }
 </script>
 
