@@ -617,16 +617,19 @@ function analyzePolicy(){
         });
 }
 
-
 function changeLanguage(language){
 
-const text =
-document.getElementById("heroText");
+const text = document.getElementById("heroText");
 
 if(language==="te"){
 
 text.innerText =
 "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
+
+}else if(language==="hi"){
+
+text.innerText =
+"समझें कि apps और websites आपके personal data के साथ क्या करते हैं।";
 
 }else{
 
@@ -636,7 +639,6 @@ text.innerText =
 }
 
 }
-
 </script>
 
 </body>
