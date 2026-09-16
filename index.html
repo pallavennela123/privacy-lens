@@ -266,8 +266,7 @@ th,td{
 
   <div class="card">
 
-    <h2>📄 Privacy Policy</h2>
-
+<h2 id="privacyPolicyHeading">Privacy Policy</h2>
     <div class="tabs">
 
       <button class="tab active"
@@ -563,12 +562,13 @@ function changeLanguage(language){
   const urlTab = document.getElementById("urlTab");
   const analyzeBtnText = document.getElementById("analyzeBtnText");
   const privacyPolicyTitle = document.getElementById("privacyPolicyTitle");
-
+const privacyPolicyHeading = document.getElementById("privacyPolicyHeading");
   if(language === "te"){
 
     text.innerText =
     "యాప్స్ మరియు వెబ్‌సైట్లు మీ పర్సనల్ డేటాతో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
-
+if(privacyPolicyHeading)
+  privacyPolicyHeading.innerText = "ప్రైవసీ పాలసీ";
     if(privacyPolicyTitle)
       privacyPolicyTitle.innerText = "ప్రైవసీ పాలసీ అనలైజర్";
 
