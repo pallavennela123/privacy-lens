@@ -1,1113 +1,578 @@
-from flask import Flask, render_template, request, jsonify
-import re
-import requests
-from bs4 import BeautifulSoup
-
-app = Flask(__name__)
-
-RULES = [
-    ("Personal Data",
-     ["personal information", "personal data", "name",
-      "email address", "phone number"], 12),
-
-    ("Location",
-     ["precise location", "gps", "geolocation",
-      "location information"], 10),
-
-    ("Contacts",
-     ["contacts", "address book", "contact list"], 8),
-
-    ("Camera",
-     ["camera access", "access to your camera",
-      "camera permission"], 7),
-
-    ("Microphone",
-     ["microphone access", "access to your microphone",
-      "microphone permission"], 7),
-
-    ("Device Information",
-     ["device information", "device identifiers",
-      "advertising id", "ip address"], 9),
-
-    ("Browsing History",
-     ["browsing history", "browser history",
-      "web activity", "online activity"], 9),
-
-    ("Cookies",
-     ["cookies", "tracking technologies",
-      "third party cookies"], 7),
-
-    ("Advertising",
-     ["personalized advertising", "targeted advertising",
-      "advertising partners", "marketing"], 10),
-
-    ("Third-party Sharing",
-     ["share personal information", "third parties",
-      "service providers", "analytics providers"], 12),
-
-    ("Data Retention",
-     ["retain personal information", "retention period",
-      "as long as necessary", "indefinitely"], 9),
-
-    ("Data Deletion",
-     ["request deletion", "delete your personal information",
-      "right to delete", "cannot delete"], 8),
-
-    ("Security",
-     ["encryption", "security safeguards",
-      "technical safeguards", "security measures"], -6)
-]
-
-
-def get_evidence(text, keyword):
-    position = text.lower().find(keyword.lower())
-
-    if position == -1:
-        return "No matching statement detected."
-
-    start = max(0, position - 60)
-    end = min(len(text), position + len(keyword) + 120)
-
-    evidence = text[start:end]
-
-    return re.sub(r"\s+", " ", evidence).strip()
-
-
-def analyze_policy(text):
-
-    score = 0
-    results = []
-
-    lower_text = text.lower()
-
-    for name, keywords, weight in RULES:
-
-        found_keyword = None
-
-        for keyword in keywords:
-            if keyword.lower() in lower_text:
-                found_keyword = keyword
-                break
-
-        if found_keyword:
-
-            if name == "Security":
-                level = "Good"
-                score += weight
-
-            elif weight >= 10:
-                level = "High"
-                score += weight
-
-            else:
-                level = "Medium"
-                score += max(2, weight)
-
-            results.append({
-                "name": name,
-                "level": level,
-                "evidence": get_evidence(text, found_keyword)
-            })
-
-        else:
-
-            results.append({
-                "name": name,
-                "level": "Low",
-                "evidence": "No matching statement detected."
-            })
-
-    score = max(0, min(100, score))
-
-    if score < 35:
-        risk = "Low"
-        title = "Lower Privacy Risk"
-
-    elif score < 65:
-        risk = "Medium"
-        title = "Moderate Privacy Risk"
-
-    else:
-        risk = "High"
-        title = "Higher Privacy Risk"
-
-    summary = []
-
-    for result in results:
-
-        if result["level"] != "Low":
-            summary.append(
-                result["name"] + ": " + result["level"]
-            )
-
-    return {
-        "score": score,
-        "risk": risk,
-        "title": title,
-        "rows": results,
-        "summary": summary
-    }
-
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-
-@app.post("/api/analyze")
-def analyze_api():
-
-    data = request.get_json()
-
-    text = data.get("text", "").strip()
-
-    if not text:
-        return jsonify({
-            "error": "No privacy policy text supplied."
-        }), 400
-
-    result = analyze_policy(text)
-
-    return jsonify(result)
-
-
-@app.post("/api/fetch-url")
-def fetch_url():
-
-    data = request.get_json()
-
-    url = data.get("url", "").strip()
-
-    if not re.match(r"^https?://", url):
-
-        return jsonify({
-            "error": "Enter a valid website URL."
-        }), 400
-
-    try:
-
-        response = requests.get(
-            url,
-            timeout=12,
-            headers={
-                "User-Agent": "PrivacyLens/1.0"
-            }
-        )
-
-        response.raise_for_status()
-
-        soup = BeautifulSoup(
-            response.text,
-            "html.parser"
-        )
-
-        for tag in soup(
-            ["script", "style", "noscript"]
-        ):
-            tag.decompose()
-
-        text = soup.get_text(
-            " ",
-            strip=True
-        )
-
-        return jsonify({
-            "text": text[:500000]
-        })
-
-    except Exception as error:
-
-        return jsonify({
-            "error": str(error)
-        }), 502
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Lens</title>
 
-<link rel="stylesheet"
-      href="{{ url_for('static',
-      filename='style.css') }}">
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
+body{
+  background:#000;
+  color:white;
+}
+
+header{
+  padding:20px;
+  border-bottom:1px solid #333;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:27px;
+  font-weight:bold;
+}
+
+.logo span{
+  color:#58d68d;
+}
+
+select,input,textarea,button{
+  padding:13px;
+  border-radius:8px;
+  border:1px solid #444;
+}
+
+select{
+  background:#171717;
+  color:white;
+}
+
+.container{
+  width:92%;
+  max-width:950px;
+  margin:30px auto;
+}
+
+.hero{
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.hero h1{
+  font-size:38px;
+  margin-bottom:12px;
+}
+
+.hero span{
+  color:#58d68d;
+}
+
+.hero p{
+  color:#bbb;
+  line-height:1.6;
+}
+
+.card{
+  background:#101010;
+  border:1px solid #292929;
+  border-radius:15px;
+  padding:22px;
+  margin-bottom:22px;
+}
+
+.tabs{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+
+.tab{
+  background:#191919;
+  color:white;
+  cursor:pointer;
+}
+
+.tab.active{
+  background:#58d68d;
+  color:black;
+}
+
+textarea,input[type="url"]{
+  width:100%;
+  background:#080808;
+  color:white;
+}
+
+textarea{
+  height:170px;
+  resize:vertical;
+}
+
+.upload{
+  border:2px dashed #444;
+  padding:30px;
+  text-align:center;
+  border-radius:12px;
+  color:#aaa;
+}
+
+.analyze{
+  width:100%;
+  margin-top:18px;
+  background:#58d68d;
+  color:black;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none;
+}
+
+#results{
+  display:none;
+}
+
+.scoreBox{
+  text-align:center;
+  background:#080808;
+  padding:25px;
+  border-radius:12px;
+}
+
+.score{
+  font-size:52px;
+  font-weight:bold;
+  color:#ff4040;
+}
+
+.risk{
+  display:inline-block;
+  margin-top:10px;
+  padding:8px 15px;
+  border-radius:20px;
+  background:#351010;
+  color:#ff4040;
+  font-weight:bold;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:13px 8px;
+  border-bottom:1px solid #292929;
+  text-align:left;
+}
+
+.badge{
+  padding:6px 10px;
+  border-radius:15px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.high{
+  background:#351010;
+  color:#ff4040;
+}
+
+.medium{
+  background:#352b08;
+  color:#ffad00;
+}
+
+.low{
+  background:#123317;
+  color:#65dc57;
+}
+
+.nutrition{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.nutrition div{
+  background:#181818;
+  padding:16px 8px;
+  text-align:center;
+  border-radius:10px;
+}
+
+.explanation{
+  background:#101b14;
+  border-left:4px solid #58d68d;
+  padding:18px;
+  line-height:1.7;
+}
+
+.warning{
+  background:#211b0a;
+  border-left:4px solid #ffad00;
+  padding:18px;
+  line-height:1.7;
+  margin-top:15px;
+}
+
+.footer{
+  text-align:center;
+  color:#777;
+  padding:30px;
+}
+
+@media(max-width:650px){
+  .hero h1{
+    font-size:30px;
+  }
+
+  .nutrition{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
 </head>
 
 <body>
 
-<div class="container">
-
 <header>
+  <div class="logo">🔐 Privacy <span>Lens</span></div>
 
-<h1>🔐 Privacy Lens</h1>
-
-<p>
-AI-assisted Privacy Policy Analyzer
-</p>
-
+  <select onchange="changeLanguage(this.value)">
+    <option value="en">English</option>
+    <option value="te">తెలుగు</option>
+  </select>
 </header>
 
+<div class="container">
 
-<div class="card">
-
-<h2>1. 📄 Add Privacy Policy</h2>
-
-<label>Paste Privacy Policy</label>
-
-<textarea
-id="policy"
-placeholder="Paste privacy policy here...">
-</textarea>
+  <div class="hero">
+    <h1>Privacy <span>Policy Analyzer</span></h1>
+    <p id="heroText">
+      Understand what apps and websites do with your personal data.
+    </p>
+  </div>
 
 
-<div class="row">
+  <!-- INPUT SECTION -->
 
-<div>
+  <div class="card">
 
-<label>Upload TXT</label>
+    <h2>📄 Privacy Policy</h2>
 
-<input
-type="file"
-id="file"
-accept=".txt">
+    <div class="tabs">
+
+      <button class="tab active"
+        onclick="showTab('text',this)">
+        📝 Paste Text
+      </button>
+
+      <button class="tab"
+        onclick="showTab('pdf',this)">
+        📄 Upload PDF
+      </button>
+
+      <button class="tab"
+        onclick="showTab('url',this)">
+        🔗 Website URL
+      </button>
+
+    </div>
+
+
+    <div id="text">
+
+      <textarea id="policyText"
+        placeholder="Paste the privacy policy here..."></textarea>
+
+    </div>
+
+
+    <div id="pdf" class="hidden">
+
+      <div class="upload">
+
+        <h3>📄 Upload Privacy Policy PDF</h3>
+
+        <p>Select a PDF from your device.</p>
+
+        <input type="file"
+          id="pdfFile"
+          accept=".pdf">
+
+      </div>
+
+    </div>
+
+
+    <div id="url" class="hidden">
+
+      <input type="url"
+        id="websiteURL"
+        placeholder="https://example.com/privacy">
+
+    </div>
+
+
+    <button class="analyze" onclick="analyzePolicy()">
+      🔍 Analyze Privacy Policy
+    </button>
+
+  </div>
+
+
+  <!-- RESULT SECTION -->
+
+  <div id="results">
+
+    <div class="card">
+
+      <h2>📊 Privacy Risk Score</h2>
+
+      <div class="scoreBox">
+
+        <div class="score">72/100</div>
+
+        <div class="risk">
+          🔴 HIGH RISK
+        </div>
+
+        <p style="margin-top:12px;color:#aaa;">
+          Higher score means higher privacy concern.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- AI ANALYSIS -->
+
+    <div class="card">
+
+      <h2>🤖 AI Analysis</h2>
+
+      <table>
+
+        <tr>
+          <th>Category</th>
+          <th>Result</th>
+        </tr>
+
+        <tr>
+          <td>Personal Data</td>
+          <td><span class="badge high">🔴 High</span></td>
+        </tr>
+
+        <tr>
+          <td>Location</td>
+          <td><span class="badge medium">🟠 Medium</span></td>
+        </tr>
+
+        <tr>
+          <td>Contacts</td>
+          <td><span class="badge low">🟢 Low</span></td>
+        </tr>
+
+        <tr>
+          <td>Camera</td>
+          <td><span class="badge low">🟢 Low</span></td>
+        </tr>
+
+        <tr>
+          <td>Microphone</td>
+          <td><span class="badge medium">🟠 Medium</span></td>
+        </tr>
+
+        <tr>
+          <td>Device Information</td>
+          <td><span class="badge high">🔴 High</span></td>
+        </tr>
+
+        <tr>
+          <td>Browsing History</td>
+          <td><span class="badge medium">🟠 Medium</span></td>
+        </tr>
+
+        <tr>
+          <td>Cookies</td>
+          <td><span class="badge medium">🟠 Medium</span></td>
+        </tr>
+
+        <tr>
+          <td>Advertising</td>
+          <td><span class="badge high">🔴 High</span></td>
+        </tr>
+
+        <tr>
+          <td>Third-party Sharing</td>
+          <td><span class="badge high">🔴 High</span></td>
+        </tr>
+
+        <tr>
+          <td>Data Retention</td>
+          <td><span class="badge medium">🟠 Medium</span></td>
+        </tr>
+
+        <tr>
+          <td>Data Deletion</td>
+          <td><span class="badge low">🟢 Low</span></td>
+        </tr>
+
+        <tr>
+          <td>Security</td>
+          <td><span class="badge low">🟢 Good</span></td>
+        </tr>
+
+      </table>
+
+    </div>
+
+
+    <!-- NUTRITION LABEL -->
+
+    <div class="card">
+
+      <h2>🏷️ Privacy Nutrition Label</h2>
+
+      <div class="nutrition">
+
+        <div>
+          <b>👤</b>
+          Personal Data
+          <br><br>
+          <span class="badge high">High</span>
+        </div>
+
+        <div>
+          <b>📍</b>
+          Location
+          <br><br>
+          <span class="badge medium">Medium</span>
+        </div>
+
+        <div>
+          <b>📢</b>
+          Advertising
+          <br><br>
+          <span class="badge high">High</span>
+        </div>
+
+        <div>
+          <b>🔗</b>
+          Third Parties
+          <br><br>
+          <span class="badge high">High</span>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- SIMPLE EXPLANATION -->
+
+    <div class="card">
+
+      <h2>💡 Simple Explanation</h2>
+
+      <div class="explanation">
+
+        <b>What does this mean?</b>
+
+        <p>
+          This policy may collect several types of personal
+          information. Some information may be used for
+          advertising or shared with third parties.
+        </p>
+
+      </div>
+
+      <div class="warning">
+
+        ⚠️ <b>Privacy Tip</b>
+
+        <p>
+          Check whether the permissions and data collection
+          are really necessary before using the service.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
 
-<div>
-
-<label>Website URL</label>
-
-<input
-type="url"
-id="url"
-placeholder="https://example.com/privacy">
-
-</div>
-
+<div class="footer">
+  🔐 Privacy Lens — Privacy made simple
 </div>
 
 
-<div class="buttons">
+<script>
 
-<button id="analyze">
-Analyze Privacy Policy
-</button>
+function showTab(tabName,button){
 
-<button id="fetch">
-Fetch URL
-</button>
+  document.getElementById("text")
+    .classList.add("hidden");
 
-<button id="sample">
-Sample
-</button>
+  document.getElementById("pdf")
+    .classList.add("hidden");
 
-</div>
+  document.getElementById("url")
+    .classList.add("hidden");
 
+  document.getElementById(tabName)
+    .classList.remove("hidden");
 
-<p id="status"></p>
+  document.querySelectorAll(".tab")
+    .forEach(btn => btn.classList.remove("active"));
 
-</div>
-
-
-<div id="results" class="hidden">
-
-<div class="card">
-
-<h2>2. 🤖 AI Analysis</h2>
+  button.classList.add("active");
+}
 
 
-<div class="scoreBox">
+function analyzePolicy(){
 
-<div id="score"
-class="score">
-0
-</div>
+  const results =
+    document.getElementById("results");
 
-<div>
+  results.style.display = "block";
 
-<h2 id="riskTitle">
-Risk Score
-</h2>
+  results.scrollIntoView({
+    behavior:"smooth"
+  });
 
-<p id="riskMessage"></p>
-
-</div>
-
-</div>
+}
 
 
-<table>
+function changeLanguage(language){
 
-<thead>
+  const text =
+    document.getElementById("heroText");
 
-<tr>
+  if(language === "te"){
 
-<th>Category</th>
+    text.innerText =
+      "Apps మరియు websites మీ personal data తో ఏమి చేస్తున్నాయో సులభంగా తెలుసుకోండి.";
 
-<th>Result</th>
+  }else{
 
-<th>Evidence</th>
+    text.innerText =
+      "Understand what apps and websites do with your personal data.";
 
-</tr>
+  }
 
-</thead>
+}
 
-
-<tbody id="tableBody">
-</tbody>
-
-</table>
-
-</div>
-
-
-<div class="card">
-
-<h2>📝 Simple Summary</h2>
-
-<ul id="summary">
-</ul>
-
-</div>
-
-
-<div class="card">
-
-<h2>
-⚠️ Privacy Nutrition Label
-</h2>
-
-<div class="nutrition">
-
-<div>
-<b>Personal Data</b>
-<br>
-<span>Data collection signals</span>
-</div>
-
-<div>
-<b>Tracking</b>
-<br>
-<span>Cookies / browsing</span>
-</div>
-
-<div>
-<b>Sharing</b>
-<br>
-<span>Third-party sharing</span>
-</div>
-
-<div>
-<b>Retention</b>
-<br>
-<span>Data retention</span>
-</div>
-
-<div>
-<b>Deletion</b>
-<br>
-<span>Deletion rights</span>
-</div>
-
-<div>
-<b>Security</b>
-<br>
-<span>Security measures</span>
-</div>
-
-</div>
-
-<p class="note">
-
-This is an educational prototype.
-It is not legal advice.
-
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-
-<script src="{{ url_for(
-'static',
-filename='app.js') }}">
 </script>
 
 </body>
-
 </html>
-* {
-    box-sizing: border-box;
-}
-
-body {
-
-    margin: 0;
-
-    background: #080808;
-
-    color: white;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-}
-
-
-.container {
-
-    max-width: 1000px;
-
-    margin: auto;
-
-    padding: 30px 18px;
-}
-
-
-header {
-
-    margin-bottom: 30px;
-}
-
-
-header h1 {
-
-    font-size: 36px;
-
-    margin-bottom: 5px;
-}
-
-
-header p {
-
-    color: #999;
-
-}
-
-
-.card {
-
-    background: #111;
-
-    border: 1px solid #292929;
-
-    border-radius: 18px;
-
-    padding: 22px;
-
-    margin-bottom: 18px;
-}
-
-
-label {
-
-    display: block;
-
-    margin: 14px 0 7px;
-
-    font-weight: bold;
-}
-
-
-textarea,
-input {
-
-    width: 100%;
-
-    background: #070707;
-
-    color: white;
-
-    border: 1px solid #333;
-
-    border-radius: 12px;
-
-    padding: 14px;
-
-    font-size: 15px;
-}
-
-
-textarea {
-
-    height: 190px;
-
-    resize: vertical;
-}
-
-
-.row {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 16px;
-}
-
-
-button {
-
-    margin-top: 15px;
-
-    margin-right: 8px;
-
-    padding: 13px 18px;
-
-    border: none;
-
-    border-radius: 11px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    background: white;
-
-    color: black;
-}
-
-
-.scoreBox {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 20px;
-
-    background: #181818;
-
-    padding: 20px;
-
-    border-radius: 15px;
-}
-
-
-.score {
-
-    width: 105px;
-
-    height: 105px;
-
-    border-radius: 50%;
-
-    border: 8px solid #777;
-
-    display: grid;
-
-    place-items: center;
-
-    font-size: 28px;
-
-    font-weight: bold;
-}
-
-
-.score.low {
-
-    border-color: #55c94d;
-}
-
-
-.score.medium {
-
-    border-color: #ffae00;
-}
-
-
-.score.high {
-
-    border-color: #ff3b30;
-}
-
-
-table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    margin-top: 20px;
-}
-
-
-th,
-td {
-
-    padding: 14px 8px;
-
-    border-bottom: 1px solid #292929;
-
-    text-align: left;
-
-    vertical-align: top;
-}
-
-
-th {
-
-    color: #999;
-
-    font-size: 13px;
-}
-
-
-.high {
-
-    color: #ff4b42;
-
-    font-weight: bold;
-}
-
-
-.medium {
-
-    color: #ffae00;
-
-    font-weight: bold;
-}
-
-
-.low,
-.good {
-
-    color: #61ce53;
-
-    font-weight: bold;
-}
-
-
-.nutrition {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 10px;
-}
-
-
-.nutrition div {
-
-    background: #181818;
-
-    padding: 15px;
-
-    border-radius: 12px;
-}
-
-
-.nutrition span {
-
-    color: #999;
-
-    font-size: 13px;
-}
-
-
-.note,
-#status {
-
-    color: #999;
-}
-
-
-.hidden {
-
-    display: none;
-}
-
-
-@media(max-width:700px) {
-
-    .row,
-    .nutrition {
-
-        grid-template-columns: 1fr;
-
-    }
-
-    header h1 {
-
-        font-size: 28px;
-
-    }
-
-    .scoreBox {
-
-        align-items: flex-start;
-
-    }
-
-}
-        const policy =
-    document.getElementById("policy");
-
-const file =
-    document.getElementById("file");
-
-const url =
-    document.getElementById("url");
-
-const status =
-    document.getElementById("status");
-
-
-document.getElementById("sample")
-.onclick = function () {
-
-    policy.value = `
-
-We collect your name,
-email address, phone number,
-IP address and device information.
-
-We may collect approximate
-location information.
-
-Our application may request
-camera and microphone access.
-
-We share personal information
-with service providers,
-analytics providers and
-advertising partners.
-
-We use cookies and similar
-tracking technologies.
-
-We retain personal information
-as long as necessary.
-
-You may request deletion of
-your personal information.
-
-We use encryption and
-technical safeguards.
-
-`;
-
-    status.textContent =
-        "Sample policy loaded.";
-};
-
-
-
-file.onchange = async function () {
-
-    const selectedFile =
-        file.files[0];
-
-    if (!selectedFile)
-        return;
-
-
-    if (
-        selectedFile.name
-        .toLowerCase()
-        .endsWith(".txt")
-    ) {
-
-        policy.value =
-            await selectedFile.text();
-
-        status.textContent =
-            "TXT file loaded.";
-
-    } else {
-
-        status.textContent =
-            "Please upload a TXT file.";
-    }
-};
-
-
-
-document.getElementById("fetch")
-.onclick = async function () {
-
-    const website =
-        url.value.trim();
-
-
-    if (!website) {
-
-        status.textContent =
-            "Enter a website URL.";
-
-        return;
-    }
-
-
-    status.textContent =
-        "Fetching website...";
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/api/fetch-url",
-                {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                        "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        url: website
-                    })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error
-            );
-        }
-
-
-        policy.value =
-            data.text;
-
-
-        status.textContent =
-            "Website text loaded.";
-
-    }
-
-    catch(error) {
-
-        status.textContent =
-            error.message;
-    }
-
-};
-
-
-
-document.getElementById("analyze")
-.onclick = async function () {
-
-    const text =
-        policy.value.trim();
-
-
-    if (!text) {
-
-        status.textContent =
-            "Please add a privacy policy.";
-
-        return;
-    }
-
-
-    status.textContent =
-        "Analyzing...";
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/api/analyze",
-                {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                        "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        text: text
-                    })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error
-            );
-        }
-
-
-        showResults(data);
-
-
-        status.textContent =
-            "Analysis completed.";
-
-    }
-
-    catch(error) {
-
-        status.textContent =
-            error.message;
-    }
-
-};
-
-
-
-function showResults(data) {
-
-    document
-        .getElementById("results")
-        .classList
-        .remove("hidden");
-
-
-    const score =
-        document.getElementById("score");
-
-
-    score.textContent =
-        data.score;
-
-
-    score.className =
-        "score " +
-        data.risk.toLowerCase();
-
-
-    document
-        .getElementById("riskTitle")
-        .textContent =
-        data.title +
-        " • " +
-        data.risk +
-        " Risk";
-
-
-    document
-        .getElementById("riskMessage")
-        .textContent =
-        "Privacy signals detected from the policy.";
-
-
-
-    const table =
-        document.getElementById(
-            "tableBody"
-        );
-
-
-    table.innerHTML = "";
-
-
-    data.rows.forEach(
-        function(row) {
-
-            const tr =
-                document.createElement(
-                    "tr"
-                );
-
-
-            tr.innerHTML = `
-
-            <td>
-                ${escapeHTML(row.name)}
-            </td>
-
-            <td class="${row.level.toLowerCase()}">
-                ${escapeHTML(row.level)}
-            </td>
-
-            <td>
-                ${escapeHTML(row.evidence)}
-            </td>
-
-            `;
-
-
-            table.appendChild(tr);
-
-        }
-    );
-
-
-
-    const summary =
-        document.getElementById(
-            "summary"
-        );
-
-
-    summary.innerHTML = "";
-
-
-    data.summary.forEach(
-        function(item) {
-
-            const li =
-                document.createElement(
-                    "li"
-                );
-
-            li.textContent =
-                item;
-
-            summary.appendChild(li);
-
-        }
-    );
-
-}
-
-
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /[&<>"']/g,
-            function(character) {
-
-                return {
-                    "&": "&amp;",
-                    "<": "&lt;",
-                    ">": "&gt;",
-                    '"': "&quot;",
-                    "'": "&#039;"
-                }[character];
-
-            }
-        );
-}
                         
                         
